@@ -10,6 +10,7 @@ import {
   ConnectedRouter,
   routerMiddleware } from 'react-router-redux';
 // root
+import mainSaga from './saga';
 import createStore from './store';
 import routes from './routes-config';
 // ui
@@ -19,6 +20,7 @@ import { RootWrapper } from './ui';
 export const history = createHistory();
 
 const store = createStore(
+  mainSaga,
   routerMiddleware(history)
 );
 
