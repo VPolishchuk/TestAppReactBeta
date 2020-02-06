@@ -1,7 +1,6 @@
 import { Provider } from 'react-redux';
 import React, { Component } from 'react';
 import { withRouter } from 'react-router';
-import { ThemeProvider } from 'styled-components';
 import { createBrowserHistory as createHistory } from 'history';
 import {
   Route,
@@ -10,34 +9,26 @@ import {
   ConnectedRouter,
   routerMiddleware } from 'react-router-redux';
 // root
-import mainSaga from './saga';
 import createStore from './store';
 import routes from './routes-config';
-// ui
-import { RootWrapper } from './ui';
+import FirebaseProvider from './firebase';
 //////////////////////////////////////////////
 
 export const history = createHistory();
 
 const store = createStore(
-  mainSaga,
   routerMiddleware(history)
-);
-
-export const RouteWithSubRoutes = (route) => (
-  <Route
-    path={route.path}
-    render={(props) => (
-      <route.component {...props} routes={route.routes} />
-    )}
-  />
 );
 
 const RootContainer = withRouter((props) => (
   <Switch>
-    {props.routes.map((route, i) => (
-      <RouteWithSubRoutes key={i} {...route} />
-    ))}
+    {
+      props.routes.map(
+        (route, i) => (
+          <Route key={i} {...route} />
+        )
+      )
+    }
   </Switch>
 ));
 
@@ -45,15 +36,15 @@ const RootContainer = withRouter((props) => (
 class AppRouter extends Component {
   render() {
     return (
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <RootWrapper>
-            <ThemeProvider theme={{}}>
+      <FirebaseProvider>
+        <Provider store={store}>
+          <ConnectedRouter history={history}>
+            <>
               <RootContainer routes={routes} />
-            </ThemeProvider>
-          </RootWrapper>
-        </ConnectedRouter>
-      </Provider>
+            </>
+          </ConnectedRouter>
+        </Provider>
+      </FirebaseProvider>
     )
   }
 };

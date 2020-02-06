@@ -1,11 +1,12 @@
 import { combineReducers } from 'redux';
 import { routerReducer as router } from 'react-router-redux';
 // features
-import items from './features/item-list/reduser';
+import list from './features/item-list/reducer';
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 const appReducer = combineReducers({
-  items
+  list,
+  router
 });
 
 const rootReducer = (state, action) => {

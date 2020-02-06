@@ -1,13 +1,20 @@
 import { createSelector } from 'reselect';
+import * as R from 'ramda';
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-const selectProfileStore = (state) => state.items;
+const selectProfileStore = (state) => state.list;
 
-const makeSelectItemList = () => createSelector(
+const makeSelectEmployeesList = () => createSelector(
   selectProfileStore,
-  (item) => item.list,
+  (list) => R.path(['employeesList'], list),
+);
+
+const makeSelectDepartmentsList = () => createSelector(
+  selectProfileStore,
+  (list) => R.path(['departmentsList'], list),
 );
 
 export {
-  makeSelectItemList,
+  makeSelectEmployeesList,
+  makeSelectDepartmentsList
 };
