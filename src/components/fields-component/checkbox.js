@@ -3,9 +3,20 @@ import React, { useEffect, useState } from 'react';
 import './style.scss';
 /////////////////////////////////////////////////////////////
 
-export const CheckboxInputComponent = ({type, values, name, label, handleBlur, setValues, ...rest}) => {
-    const [checked, setChecked] = useState(false);
+export const CheckboxInputComponent = ({
+  type,
+  // setChecked,
+  // checked,
+  values,
+  name,
+  label,
+  handleBlur,
+  setValues,
+  ...rest }) => {
   
+  const [checked, setChecked] = useState(false);
+
+    console.log('checked', checked)
     const handleChange = () => {
       setChecked(!checked)
     }
@@ -26,11 +37,11 @@ export const CheckboxInputComponent = ({type, values, name, label, handleBlur, s
             />
             <div className="styled-container">
               <svg
-                className={checked && 'checked'}
-                viewBox="0 0 24 24"
                 fill='none'
                 stroke='white'
                 stroke-width='2px'
+                viewBox="0 0 24 24"
+                className={checked && 'checked'}
               >
                 <polyline points="20 6 9 17 4 12" />
               </svg>

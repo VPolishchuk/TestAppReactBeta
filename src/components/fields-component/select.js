@@ -10,10 +10,16 @@ const SelectInputComponent = ({
     values,
     options,
     setValues,
-    initValue,
+    // initValue,
     labelDisplay,
+    defOption,
+    selectedOption,
+    setSelectedOptions
   }) => {
-    const [selectedOption, setSelectedOptions] = useState();
+    // const [selectedOption, setSelectedOptions] = useState({});
+    // console.log('initValue', initValue)
+    console.log('selectedOption', selectedOption)
+    console.log('defOption', defOption)
 
     const handleChange = selectedOption => {
         setSelectedOptions(selectedOption);
@@ -21,8 +27,6 @@ const SelectInputComponent = ({
     useEffect(() => {
         setValues(R.set(R.lensProp(name), selectedOption, values))
     }, [selectedOption])
-    console.log('selectedOption', initValue);
-
     return (
         <>
         {

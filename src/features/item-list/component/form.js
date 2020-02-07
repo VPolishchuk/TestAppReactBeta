@@ -32,7 +32,9 @@ const fieldSetting = [
 ];
 
 const FormComponent = (props) => {
-  // const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [selectedOption, setSelectedOptions] = useState({});
+
   useEffect(() => {
     props.setValues(props.initValues)
   }, [props.initValues])
@@ -49,8 +51,10 @@ const FormComponent = (props) => {
                   <SelectInput
                     {...field}
                     {...props}
+                    setSelectedOptions={setSelectedOptions}
                     // initValue={props.values && R.path([field.name], props.values)}
-                    defOption={props.edit ? props.values && R.path([field.name], props.values) : {}}
+                    selectedOption={props.edit ? props.values && R.path([field.name], props.values) : {}}
+                    
                   />
                 )
               }
@@ -62,7 +66,7 @@ const FormComponent = (props) => {
                     {...props}
                     // setChecked={setChecked}
                     // checked={props.values && R.path([field.name], props.values)}
-                    // checked={props.edit ? props.values && R.path([field.name], props.values) : checked}
+                    checked={props.edit ? props.values && R.path([field.name], props.values) : checked}
                   />
                 )
               }

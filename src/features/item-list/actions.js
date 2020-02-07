@@ -11,3 +11,6 @@ export const deleteItemRequest = createAction('deleteItemRequest');
 
 export const updateItemRequest = createAction('updateItemRequest');
 
+export const getEditItemDataRequest = createAction('getEditItemDataRequest');
+
+export const clearEditItemRequest = createAction('clearEditItemRequest');

@@ -1,16 +1,13 @@
 // import * as R from 'ramda';
 import * as R from 'ramda';
 import { connect } from 'react-redux';
-import { Route, Redirect } from 'react-router-dom';
 import { createStructuredSelector } from 'reselect';
-import React, { useState, useEffect, useContext } from 'react';
-// component
-import SingInForm from '../auth';
+import React, { useState, useEffect } from 'react';
 // features
 import app from "../../firebase-config";
-import EditForm from './component/edit-form';
 import SearchComponent from './component/search-input';
 import CreateEmpFormComponent from './component/item-form';
+// import CreateEmpFormComponent from './component/form';
 import {
   makeSelectEmployeesList,
   makeSelectDepartmentsList } from './selectors';
@@ -20,6 +17,7 @@ import {
   updateItemRequest,
   getEmployeesDataSuccess,
   getDepartmentsDataSuccess,
+  getEditItemDataRequest,
 } from './actions';
 // ui
 import './style.scss';
@@ -27,11 +25,11 @@ import './style.scss';
 
 
 const ActionComponent = (props) => {
-  const { edit, setEdit, handelDelete } = props;
+  const { handleEditEmp, handelDelete } = props;
   return (
     <div className='column actions'>
       <img src="https://img.icons8.com/ios/50/000000/invisible.png" />
-      <img onClick={() => setEdit(!edit)} src="https://img.icons8.com/ios-glyphs/30/000000/edit.png"/>
+      <img onClick={() => handleEditEmp()} src="https://img.icons8.com/ios-glyphs/30/000000/edit.png"/>
       <img onClick={() => handelDelete()}  src="https://img.icons8.com/material-rounded/24/000000/delete.png"/>
     </div>
 )};
@@ -39,13 +37,21 @@ const ActionComponent = (props) => {
 const RowComponent = (props) => {
   const {
     item,
+    edit,
+    modal,
     column,
     options,
+    setEdit,
+    setModal,
     deleteItemRequest,
     updateItemRequest,
+    getEditItemDataRequest,
    } = props;
-  const [edit, setEdit] = useState(false)
-
+  const handleEditEmp = () => {
+    getEditItemDataRequest(item);
+    setEdit(!edit)
+    setModal(!modal)
+  }
   const handelDelete = () => {
     const db = app.firestore()
     db.collection('employees').doc(item.empID).delete()
@@ -66,8 +72,7 @@ const RowComponent = (props) => {
             if(key === 'actions') {
               return (
                 <ActionComponent
-                  edit={edit}
-                  setEdit={setEdit}
+                  handleEditEmp={handleEditEmp}
                   handelDelete={handelDelete}
                 />
               )
@@ -96,19 +101,20 @@ const RowComponent = (props) => {
           })
         }
       </div>
-      <EditForm keys={column} item={item} options={options} updateItemRequest={updateItemRequest}/>
     </div>
 )}
 
 export const ItemListComponent = (props) => {
   const {
     employeesList,
+    departmentsList,
     updateItemRequest,
     deleteItemRequest,
-    departmentsList,
+    getEditItemDataRequest,
     getEmployeesDataSuccess,
     getDepartmentsDataSuccess } = props;
   const [modal, setModal] = useState(false);
+  const [edit, setEdit] = useState(false)
 
   const departmentsOptions = departmentsList.map(
     (item) => ({
@@ -135,10 +141,13 @@ export const ItemListComponent = (props) => {
         let data = doc.data();
         if (R.has('empID', data) && R.isEmpty(data.empID)) {
           data = R.set(R.lensProp('empID'), doc.id, data);
+        } else {
+          data = R.assoc('empID', doc.id, data)
         }
         return ({...data})
       });
       const departmentsData = dataDep.docs.map(doc => ({...doc.data()}));
+      console.log('employeesData', employeesData)
       getEmployeesDataSuccess(employeesData);
       getDepartmentsDataSuccess(departmentsData);
     };
@@ -171,11 +180,16 @@ export const ItemListComponent = (props) => {
                 <RowComponent
                   i={i}
                   key={i}
+                  edit={edit}
                   item={item}
+                  modal={modal}
                   column={column}
+                  setEdit={setEdit}
+                  setModal={setModal}
                   options={departmentsOptions}
                   deleteItemRequest={deleteItemRequest}
                   updateItemRequest={updateItemRequest}
+                  getEditItemDataRequest={getEditItemDataRequest}
                 />
               )
             )
@@ -185,7 +199,7 @@ export const ItemListComponent = (props) => {
       {
         modal &&
         <div className='modal-wrap'>
-          <CreateEmpFormComponent options={departmentsOptions} setModal={setModal}/>
+          <CreateEmpFormComponent edit={edit} setEdit={setEdit} options={departmentsOptions} setModal={setModal}/>
         </div>
       }
     </>
@@ -201,6 +215,7 @@ export default connect(mapStateToProps, {
   createItemRequest,
   deleteItemRequest,
   updateItemRequest,
+  getEditItemDataRequest,
   getEmployeesDataSuccess,
   getDepartmentsDataSuccess,
 })(ItemListComponent);

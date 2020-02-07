@@ -14,7 +14,13 @@ const makeSelectDepartmentsList = () => createSelector(
   (list) => R.path(['departmentsList'], list),
 );
 
+const makeSelectItem = () => createSelector(
+  selectProfileStore,
+  (list) => R.path(['item'], list),
+);
+
 export {
+  makeSelectItem,
   makeSelectEmployeesList,
   makeSelectDepartmentsList
 };

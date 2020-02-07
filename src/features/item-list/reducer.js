@@ -8,7 +8,12 @@ import * as A from './actions';
 export const initialState = {
   employeesList: {},
   departmentsList: [],
+  item: {}
 };
+
+const getEditItemDataRequest = (state, data) => (
+  P.$set('item', data, state)
+);
 
 const getEmployeesListData = (state, data) => {
   const indexObj =  R.indexBy(R.prop('empID'), data);
@@ -22,6 +27,10 @@ const getDepartmentsListData = (state, data) => (
 
 const deleteEmployeerFromList = (state, data) => (
   P.$set('employeesList', R.omit([data], R.path(['employeesList'], state)), state)
+);
+
+const clearEditItemRequest = (state, data) => (
+  P.$set('item', {}, state)
 );
 
 const updateEmployeersList = (state, data) => {
@@ -39,4 +48,6 @@ export default createReducer({
   [A.getEmployeesDataSuccess]: getEmployeesListData,
   [A.getDepartmentsDataSuccess]: getDepartmentsListData,
   [A.deleteItemRequest]: deleteEmployeerFromList,
+  [A.getEditItemDataRequest]: getEditItemDataRequest,
+  [A.clearEditItemRequest]: clearEditItemRequest,
 }, initialState);
