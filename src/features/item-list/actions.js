@@ -14,3 +14,5 @@ export const updateItemRequest = createAction('updateItemRequest');
 export const getEditItemDataRequest = createAction('getEditItemDataRequest');
 
 export const clearEditItemRequest = createAction('clearEditItemRequest');
+
+export const getSearchItemRequest = createAction('getSearchItemRequest');

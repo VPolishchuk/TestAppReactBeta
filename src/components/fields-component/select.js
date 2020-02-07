@@ -13,10 +13,10 @@ const SelectInputComponent = ({
     // initValue,
     labelDisplay,
     defOption,
-    selectedOption,
-    setSelectedOptions
+    // selectedOption,
+    // setSelectedOptions
   }) => {
-    // const [selectedOption, setSelectedOptions] = useState({});
+    const [selectedOption, setSelectedOptions] = useState({});
     // console.log('initValue', initValue)
     console.log('selectedOption', selectedOption)
     console.log('defOption', defOption)

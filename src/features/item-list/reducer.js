@@ -21,6 +21,12 @@ const getEmployeesListData = (state, data) => {
   P.$set('employeesList', indexObj, state)
 )};
 
+const getSearchItemRequest = (state, data) => {
+  const indexObj =  R.indexBy(R.prop('empID'), data);
+  return (
+  P.$set('employeesList', indexObj, state)
+)};
+
 const getDepartmentsListData = (state, data) => (
   P.$set('departmentsList', data, state)
 );
@@ -50,4 +56,5 @@ export default createReducer({
   [A.deleteItemRequest]: deleteEmployeerFromList,
   [A.getEditItemDataRequest]: getEditItemDataRequest,
   [A.clearEditItemRequest]: clearEditItemRequest,
+  [A.getSearchItemRequest]: getSearchItemRequest,
 }, initialState);

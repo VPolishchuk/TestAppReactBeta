@@ -5,7 +5,8 @@ import { createStructuredSelector } from 'reselect';
 import React, { useState, useEffect } from 'react';
 // features
 import app from "../../firebase-config";
-import SearchComponent from './component/search-input';
+// import SearchComponent from './component/search-input';
+import SearchComponent from '../../components/search-component/index';
 import CreateEmpFormComponent from './component/item-form';
 // import CreateEmpFormComponent from './component/form';
 import {
@@ -15,14 +16,14 @@ import {
   createItemRequest,
   deleteItemRequest,
   updateItemRequest,
+  getSearchItemRequest,
+  getEditItemDataRequest,
   getEmployeesDataSuccess,
   getDepartmentsDataSuccess,
-  getEditItemDataRequest,
 } from './actions';
 // ui
 import './style.scss';
 // /////////////////////////////////////////////////////////////////
-
 
 const ActionComponent = (props) => {
   const { handleEditEmp, handelDelete } = props;
@@ -102,7 +103,7 @@ const RowComponent = (props) => {
         }
       </div>
     </div>
-)}
+)};
 
 export const ItemListComponent = (props) => {
   const {
@@ -110,6 +111,7 @@ export const ItemListComponent = (props) => {
     departmentsList,
     updateItemRequest,
     deleteItemRequest,
+    getSearchItemRequest,
     getEditItemDataRequest,
     getEmployeesDataSuccess,
     getDepartmentsDataSuccess } = props;
@@ -132,12 +134,34 @@ export const ItemListComponent = (props) => {
   let column = R.keys(R.omit(['emp_dpID'], R.head(R.values(employeesList))));
   column.push('empDepartment', 'actions');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const db = app.firestore();
-      const dataEmp = await db.collection('employees').get();
-      const dataDep = await db.collection('departments').get();
-      const employeesData = dataEmp.docs.map(doc => {
+  const fetchData = async () => {
+    const db = app.firestore();
+    const dataEmp = await db.collection('employees').get();
+    const dataDep = await db.collection('departments').get();
+    const employeesData = dataEmp.docs.map(doc => {
+      let data = doc.data();
+      if (R.has('empID', data) && R.isEmpty(data.empID)) {
+        data = R.set(R.lensProp('empID'), doc.id, data);
+      } else {
+        data = R.assoc('empID', doc.id, data)
+      }
+      return ({...data})
+    });
+    const departmentsData = dataDep.docs.map(doc => ({...doc.data()}));
+    getEmployeesDataSuccess(employeesData);
+    getDepartmentsDataSuccess(departmentsData);
+  };
+
+
+  const fetchDataLimit = async () => {
+    const db = app.firestore();
+    const dataEmp = await db.collection('employees');
+    const first = dataEmp.orderBy("empName").limit(3);
+    const test = first.get().then(function (documentSnapshots) {
+      // Get the last visible document
+      let lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+      console.log("last", lastVisible);
+      const employeesData = documentSnapshots.docs.map(doc => {
         let data = doc.data();
         if (R.has('empID', data) && R.isEmpty(data.empID)) {
           data = R.set(R.lensProp('empID'), doc.id, data);
@@ -146,12 +170,19 @@ export const ItemListComponent = (props) => {
         }
         return ({...data})
       });
-      const departmentsData = dataDep.docs.map(doc => ({...doc.data()}));
-      console.log('employeesData', employeesData)
-      getEmployeesDataSuccess(employeesData);
-      getDepartmentsDataSuccess(departmentsData);
-    };
+      console.log("employeesData", employeesData);
+      // let next = db.collection("cities")
+      //       .orderBy("population")
+      //       .startAfter(lastVisible)
+      //       .limit(25);
+      });
+
+    console.log('test______', test.then(data => console.log('data___', data)))
+  };
+
+  useEffect(() => {
     fetchData();
+    fetchDataLimit()
   }, [])
   return (
     <>
@@ -165,7 +196,10 @@ export const ItemListComponent = (props) => {
         <button onClick={() => app.auth().signOut()}>Sign out</button>
       </nav>
       <div className='tb-wrap'>
-        <SearchComponent {...props}/>
+        <SearchComponent
+          actionCL={fetchData}
+          actionSR={getSearchItemRequest}
+        />
         <header>
           {
             column.map(
@@ -199,7 +233,12 @@ export const ItemListComponent = (props) => {
       {
         modal &&
         <div className='modal-wrap'>
-          <CreateEmpFormComponent edit={edit} setEdit={setEdit} options={departmentsOptions} setModal={setModal}/>
+          <CreateEmpFormComponent
+            edit={edit}
+            setEdit={setEdit}
+            setModal={setModal}
+            options={departmentsOptions}
+          />
         </div>
       }
     </>
@@ -215,6 +254,7 @@ export default connect(mapStateToProps, {
   createItemRequest,
   deleteItemRequest,
   updateItemRequest,
+  getSearchItemRequest,
   getEditItemDataRequest,
   getEmployeesDataSuccess,
   getDepartmentsDataSuccess,
