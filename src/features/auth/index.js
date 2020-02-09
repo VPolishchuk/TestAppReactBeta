@@ -9,6 +9,7 @@ import './style.scss';
 // ///////////////////////////////////////////////////////
 
 const SingInForm = (props) => {
+  const { history } = props;
   const { currentUser } = useContext(AuthContext);
   if (currentUser) {
     return <Redirect to="/"/>;
@@ -22,16 +23,12 @@ const SingInForm = (props) => {
       }}
         onSubmit={(values) => {
           const { email, password } = values;
-            // app
-            //   .auth()
-            //   .signInWithEmailAndPassword(email, password);
-            // props.history.push("/");
             const login = async () => {
               try {
                 await app
                   .auth()
                   .signInWithEmailAndPassword(email, password);
-                props.history.push("/");
+                history.push("/");
               } catch (error) {
                 alert(error);
               }
@@ -45,11 +42,11 @@ const SingInForm = (props) => {
             <label>
               <input
                 type="email"
+                name="email"
                 onChange={props.handleChange}
                 onBlur={props.handleBlur}
-                name="email"
               />
-              {props.errors.name && <div id="feedback">{props.errors.name}</div>}
+              {props.errors.name && <div>{props.errors.name}</div>}
             </label>
             <label>
               <input
@@ -68,46 +65,3 @@ const SingInForm = (props) => {
 )};
 
 export default SingInForm;
-
-// const Login = ({ history }) => {
-//   const handleLogin = useCallback(
-//     async event => {
-//       event.preventDefault();
-//       const { email, password } = event.target.elements;
-//       try {
-//         await app
-//           .auth()
-//           .signInWithEmailAndPassword(email.value, password.value);
-//         history.push("/");
-//       } catch (error) {
-//         alert(error);
-//       }
-//     },
-//     [history]
-//   );
-
-//   const { currentUser } = useContext(AuthContext);
-//     // console.log('currentUser', currentUser)
-//   if (currentUser) {
-//     return <Redirect to="/" />;
-//   }
-
-//   return (
-//     <div className='layout'> 
-//       <form onSubmit={handleLogin}>
-//         <p>Welcam</p>
-//         <label>
-//           Email
-//           <input name="email" type="email" placeholder="Email" />
-//         </label>
-//         <label>
-//           Password
-//           <input name="password" type="password" placeholder="Password" />
-//         </label>
-//         <button type="submit">Log in</button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default Login;

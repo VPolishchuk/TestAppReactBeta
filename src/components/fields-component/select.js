@@ -10,16 +10,10 @@ const SelectInputComponent = ({
     values,
     options,
     setValues,
-    // initValue,
     labelDisplay,
     defOption,
-    // selectedOption,
-    // setSelectedOptions
   }) => {
     const [selectedOption, setSelectedOptions] = useState({});
-    // console.log('initValue', initValue)
-    console.log('selectedOption', selectedOption)
-    console.log('defOption', defOption)
 
     const handleChange = selectedOption => {
         setSelectedOptions(selectedOption);

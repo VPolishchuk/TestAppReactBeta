@@ -8,7 +8,12 @@ import {
 import {
   ConnectedRouter,
   routerMiddleware } from 'react-router-redux';
+// features
+import PrivateRoute from './features/home';
+import SingInForm from './features/auth/index';
+import ProtectedPage from './features/item-list/index';
 // root
+import mainSaga from './saga';
 import createStore from './store';
 import routes from './routes-config';
 import FirebaseProvider from './firebase';
@@ -17,18 +22,25 @@ import FirebaseProvider from './firebase';
 export const history = createHistory();
 
 const store = createStore(
+  mainSaga,
   routerMiddleware(history)
 );
 
 const RootContainer = withRouter((props) => (
   <Switch>
-    {
+    {/* {
       props.routes.map(
         (route, i) => (
           <Route key={i} {...route} />
         )
       )
-    }
+    } */}
+      <Route exact path="/sing-in" >
+        <SingInForm {...props} />
+      </Route>
+      <PrivateRoute exact path="/">
+        <ProtectedPage {...props} />
+      </PrivateRoute>
   </Switch>
 ));
 

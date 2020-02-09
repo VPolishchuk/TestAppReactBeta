@@ -16,7 +16,6 @@ export const CheckboxInputComponent = ({
   
   const [checked, setChecked] = useState(false);
 
-    console.log('checked', checked)
     const handleChange = () => {
       setChecked(!checked)
     }

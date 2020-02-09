@@ -14,20 +14,20 @@ import { createStructuredSelector } from 'reselect';
 
 const fieldSetting = [
     {
-        type: 'text',
-        name: 'empName',
-        label: 'Emp Name',
+      type: 'text',
+      name: 'empName',
+      label: 'Emp Name',
     },
     {
-        type: 'checkbox',
-        name: 'empActive',
-        label: 'Active',
+      type: 'checkbox',
+      name: 'empActive',
+      label: 'Active',
     },
     {
-        type: 'select',
-        labelDisplay: true,
-        name: 'empDepartment',
-        label: 'Emp Department',
+      type: 'select',
+      labelDisplay: true,
+      name: 'empDepartment',
+      label: 'Emp Department',
     }
 ];
 
@@ -38,8 +38,6 @@ const FormComponent = (props) => {
   useEffect(() => {
     props.setValues(props.initValues)
   }, [props.initValues])
-  console.log('values', props.values)
-  // console.log('checked', checked)
   return (
     <form id ='create-item-form' onSubmit={props.handleSubmit}>
       <p>{props.edit ? 'Edit Item' : 'Add Item'}</p>

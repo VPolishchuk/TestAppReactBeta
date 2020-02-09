@@ -36,7 +36,7 @@ const FormComponent = (props) => {
   useEffect(() => {
     props.setValues(props.initValues)
   }, [props.initValues])
-  console.log('values', props.values)
+  // console.log('values', props.values)
   // console.log('checked', checked)
   return (
     <form id ='create-item-form' onSubmit={props.handleSubmit}>

@@ -32,7 +32,9 @@
     "redux-logger": "^3.0.6",
     "reselect": "^4.0.0",
     "schema-utils": "^2.1.0",
-    "yup": "^0.27.0"
+    "yup": "^0.27.0",
+    "redux-saga": "^0.15.6",
+    "redux-saga-router": "^2.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

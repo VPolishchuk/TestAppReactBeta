@@ -134,24 +134,6 @@ export const ItemListComponent = (props) => {
   let column = R.keys(R.omit(['emp_dpID'], R.head(R.values(employeesList))));
   column.push('empDepartment', 'actions');
 
-  const fetchData = async () => {
-    const db = app.firestore();
-    const dataEmp = await db.collection('employees').get();
-    const dataDep = await db.collection('departments').get();
-    const employeesData = dataEmp.docs.map(doc => {
-      let data = doc.data();
-      if (R.has('empID', data) && R.isEmpty(data.empID)) {
-        data = R.set(R.lensProp('empID'), doc.id, data);
-      } else {
-        data = R.assoc('empID', doc.id, data)
-      }
-      return ({...data})
-    });
-    const departmentsData = dataDep.docs.map(doc => ({...doc.data()}));
-    getEmployeesDataSuccess(employeesData);
-    getDepartmentsDataSuccess(departmentsData);
-  };
-
 
   const fetchDataLimit = async () => {
     const db = app.firestore();
@@ -160,7 +142,7 @@ export const ItemListComponent = (props) => {
     const test = first.get().then(function (documentSnapshots) {
       // Get the last visible document
       let lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
-      console.log("last", lastVisible);
+      // console.log("last", lastVisible);
       const employeesData = documentSnapshots.docs.map(doc => {
         let data = doc.data();
         if (R.has('empID', data) && R.isEmpty(data.empID)) {
@@ -170,20 +152,16 @@ export const ItemListComponent = (props) => {
         }
         return ({...data})
       });
-      console.log("employeesData", employeesData);
+      // console.log("employeesData", employeesData);
       // let next = db.collection("cities")
       //       .orderBy("population")
       //       .startAfter(lastVisible)
       //       .limit(25);
       });
 
-    console.log('test______', test.then(data => console.log('data___', data)))
+    // console.log('test______', test.then(data => console.log('data___', data)))
   };
 
-  useEffect(() => {
-    fetchData();
-    fetchDataLimit()
-  }, [])
   return (
     <>
       <nav>
@@ -197,7 +175,7 @@ export const ItemListComponent = (props) => {
       </nav>
       <div className='tb-wrap'>
         <SearchComponent
-          actionCL={fetchData}
+          // actionCL={fetchData}і
           actionSR={getSearchItemRequest}
         />
         <header>

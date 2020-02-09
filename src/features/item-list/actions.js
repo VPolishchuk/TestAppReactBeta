@@ -3,6 +3,8 @@ import { createAction } from 'redux-act';
 
 export const getEmployeesDataSuccess = createAction('getEmployeesDataSuccess');
 
+export const getEmployeesDataRequest = createAction('getEmployeesDataRequest');
+
 export const getDepartmentsDataSuccess = createAction('getDepartmentsDataSuccess');
 
 export const createItemRequest = createAction('createItemRequest');
