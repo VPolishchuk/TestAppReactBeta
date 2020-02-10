@@ -1,9 +1,9 @@
 
 
-.wrapper{
+.wrapper {
     width: 100%;
     display: flex;
-    min-width: 900px;
+    // min-width: 900px;
     min-height: 100vh;
     position: relative;
     align-items: center;
@@ -45,22 +45,20 @@
 }
 
 // imputs
-
 .input-wrap {
-    position: relative;
     display: flex;
     margin: 10px 0;
+    position: relative;
     align-items: center;
-    // width: 100%;
     label span {
         margin-right: 15px;
     }
     input {
+        border: 0;
         width : 70%;
         height: 40px;
-        margin: 10px 0;
-        border: 0;
         cursor: text;
+        margin: 10px 0;
         padding: 0 15px 0;
         border-radius: 5px;
         box-shadow: -1px 0px 8px 0px #948888;

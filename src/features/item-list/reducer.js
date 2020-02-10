@@ -6,6 +6,8 @@ import * as A from './actions';
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const initialState = {
+  limit: 10,
+  lastVisible: null,
   employeesList: {},
   departmentsList: [],
   item: {}
@@ -17,8 +19,9 @@ const getEditItemDataRequest = (state, data) => (
 
 const getEmployeesListData = (state, data) => {
   const indexObj =  R.indexBy(R.prop('empID'), data);
+  const newData = R.merge(R.path(['employeesList'], state), indexObj)
   return (
-  P.$set('employeesList', indexObj, state)
+  P.$set('employeesList', newData, state)
 )};
 
 const getSearchItemRequest = (state, data) => {
@@ -46,7 +49,7 @@ const updateEmployeersList = (state, data) => {
     R.path(['employeesList'], state)
   )
   return (
-  P.$set('employeesList', upData, state)
+    P.$set('employeesList', upData, state)
 )};
 
 export default createReducer({

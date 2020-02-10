@@ -6,12 +6,9 @@ import './style.scss';
 const SearchComponent = (props) => {
     const [value, setValue] = useState(null);
     const [searchField, setSearchfield] = useState(null);
-    const handelChange = (value) => {
-        const searchFunct = async() => {
-
-        }
-
-        return setValue(value);
+    const handelClean = () => {
+        setValue(null);
+        props.actionCL();
     }
 
     const handelSearch = () => {
@@ -41,10 +38,10 @@ const SearchComponent = (props) => {
                 type='search'
                 value={value}
                 placeholder={`Search by empName`}
-                onChange={(e) => handelChange(e.target.value)}
+                onChange={(e) => setValue(e.target.value)}
             />
             <button onClick={() => handelSearch()} >search</button>
-            <button onClick={() => props.actionCL()} >Clear Filter</button>
+            <button onClick={() => handelClean()} >Clear Filter</button>
         </div>
     );
 }

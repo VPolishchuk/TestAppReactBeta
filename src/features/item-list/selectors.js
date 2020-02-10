@@ -19,8 +19,14 @@ const makeSelectItem = () => createSelector(
   (list) => R.path(['item'], list),
 );
 
+const makeSelectLimitList = () => createSelector(
+  selectProfileStore,
+  (list) => R.path(['limit'], list),
+);
+
 export {
   makeSelectItem,
+  makeSelectLimitList,
   makeSelectEmployeesList,
   makeSelectDepartmentsList
 };

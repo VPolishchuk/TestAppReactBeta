@@ -3,25 +3,31 @@ import React, { useEffect, useState } from 'react';
 import './style.scss';
 /////////////////////////////////////////////////////////////
 
-export const CheckboxInputComponent = ({
-  type,
-  // setChecked,
-  // checked,
-  values,
-  name,
-  label,
-  handleBlur,
-  setValues,
-  ...rest }) => {
-  
-  const [checked, setChecked] = useState(false);
+export const CheckboxInputComponent = (props) => {
+  const {
+    type,
+    // setChecked,
+    // checked,
+    values,
+    name,
+    // edit,
+    label,
+    checked,
+    handleBlur,
+    handelChangeR,
+    setValues,
+    ...rest } = props;
+  // const [checked, setChecked] = useState(false);
 
-    const handleChange = () => {
-      setChecked(!checked)
-    }
-    useEffect(() => {
-      setValues(R.set(R.lensProp(name), checked, values))
-    }, [checked])
+  //   const handleChange = () => {
+  //     console.log('render')
+  //     setChecked(!checked)
+  //   }
+    // useEffect(() => {
+    //   // console.log('render2')
+    //   setValues(R.set(R.lensProp(name), checked, values))
+    //   // handleCheck(R.path([name], values));
+    // }, [checked])
     return (
       <div className="input-wrap">
         <label>
@@ -32,7 +38,7 @@ export const CheckboxInputComponent = ({
               name={name}
               checked={checked}
               onBlur={handleBlur}
-              onChange={handleChange}
+              onChange={() => handelChangeR(name, !checked)}
             />
             <div className="styled-container">
               <svg

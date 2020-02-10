@@ -1,12 +1,12 @@
 // import * as R from 'ramda';
 import * as R from 'ramda';
 import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
 import React, { useState, useEffect } from 'react';
+import { createStructuredSelector } from 'reselect';
+import InfiniteScroll from "react-infinite-scroll-component";
 // features
 import app from "../../firebase-config";
-// import SearchComponent from './component/search-input';
-import SearchComponent from '../../components/search-component/index';
+import SearchComponent from './component/search-input';
 import CreateEmpFormComponent from './component/item-form';
 // import CreateEmpFormComponent from './component/form';
 import {
@@ -15,10 +15,10 @@ import {
 import {
   createItemRequest,
   deleteItemRequest,
-  updateItemRequest,
   getSearchItemRequest,
   getEditItemDataRequest,
   getEmployeesDataSuccess,
+  getEmployeesDataRequest,
   getDepartmentsDataSuccess,
 } from './actions';
 // ui
@@ -29,9 +29,9 @@ const ActionComponent = (props) => {
   const { handleEditEmp, handelDelete } = props;
   return (
     <div className='column actions'>
-      <img src="https://img.icons8.com/ios/50/000000/invisible.png" />
-      <img onClick={() => handleEditEmp()} src="https://img.icons8.com/ios-glyphs/30/000000/edit.png"/>
-      <img onClick={() => handelDelete()}  src="https://img.icons8.com/material-rounded/24/000000/delete.png"/>
+      <img className='view' src="https://img.icons8.com/ios/50/000000/invisible.png" />
+      <img className='edit' onClick={() => handleEditEmp()} src="https://img.icons8.com/ios-glyphs/30/000000/edit.png"/>
+      <img className='delete'  onClick={() => handelDelete()}  src="https://img.icons8.com/material-rounded/24/000000/delete.png"/>
     </div>
 )};
 
@@ -45,7 +45,6 @@ const RowComponent = (props) => {
     setEdit,
     setModal,
     deleteItemRequest,
-    updateItemRequest,
     getEditItemDataRequest,
    } = props;
   const handleEditEmp = () => {
@@ -65,43 +64,41 @@ const RowComponent = (props) => {
   }
 
   return (
-    <div className='row-wrap'>
-      <div key={props.i} className='row'>
-        {
-          column.map(
-            (key,i ) => {
-            if(key === 'actions') {
-              return (
-                <ActionComponent
-                  handleEditEmp={handleEditEmp}
-                  handelDelete={handelDelete}
-                />
-              )
-            }
-            if(key === 'empActive') {
-              return (
-                <div key={i} className='column'>
-                {
-                  item[key] ? 
-                  <img src="https://img.icons8.com/material-rounded/24/000000/checked.png"/> :
-                  <img src="https://img.icons8.com/material-rounded/24/000000/cancel.png"/>
-                }
-              </div>
-                
-              )
-            }
+    <div key={props.i} className='row'>
+      {
+        column.map(
+          (key,i ) => {
+          if(key === 'actions') {
             return (
-              <div key={i} className='column'>
-                {
-                  R.is(Object, item[key]) ? 
-                  item[key].label :
-                  item[key]
-                }
-              </div>
+              <ActionComponent
+                handleEditEmp={handleEditEmp}
+                handelDelete={handelDelete}
+              />
             )
-          })
-        }
-      </div>
+          }
+          if(key === 'empActive') {
+            return (
+              <div key={i} className='column empActive'>
+              {
+                item[key] ? 
+                <img src="https://img.icons8.com/material-rounded/24/000000/checked.png"/> :
+                <img src="https://img.icons8.com/material-rounded/24/000000/cancel.png"/>
+              }
+            </div>
+              
+            )
+          }
+          return (
+            <div key={i} className={`column ${key}`}>
+              {
+                R.is(Object, item[key]) ? 
+                item[key].label :
+                item[key]
+              }
+            </div>
+          )
+        })
+      }
     </div>
 )};
 
@@ -114,9 +111,16 @@ export const ItemListComponent = (props) => {
     getSearchItemRequest,
     getEditItemDataRequest,
     getEmployeesDataSuccess,
+    getEmployeesDataRequest,
     getDepartmentsDataSuccess } = props;
   const [modal, setModal] = useState(false);
   const [edit, setEdit] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+
+  const getMoreData = () => {
+    props.getEmployeesDataRequest();
+
+  }
 
   const departmentsOptions = departmentsList.map(
     (item) => ({
@@ -134,34 +138,6 @@ export const ItemListComponent = (props) => {
   let column = R.keys(R.omit(['emp_dpID'], R.head(R.values(employeesList))));
   column.push('empDepartment', 'actions');
 
-
-  const fetchDataLimit = async () => {
-    const db = app.firestore();
-    const dataEmp = await db.collection('employees');
-    const first = dataEmp.orderBy("empName").limit(3);
-    const test = first.get().then(function (documentSnapshots) {
-      // Get the last visible document
-      let lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
-      // console.log("last", lastVisible);
-      const employeesData = documentSnapshots.docs.map(doc => {
-        let data = doc.data();
-        if (R.has('empID', data) && R.isEmpty(data.empID)) {
-          data = R.set(R.lensProp('empID'), doc.id, data);
-        } else {
-          data = R.assoc('empID', doc.id, data)
-        }
-        return ({...data})
-      });
-      // console.log("employeesData", employeesData);
-      // let next = db.collection("cities")
-      //       .orderBy("population")
-      //       .startAfter(lastVisible)
-      //       .limit(25);
-      });
-
-    // console.log('test______', test.then(data => console.log('data___', data)))
-  };
-
   return (
     <>
       <nav>
@@ -175,38 +151,52 @@ export const ItemListComponent = (props) => {
       </nav>
       <div className='tb-wrap'>
         <SearchComponent
-          // actionCL={fetchData}і
           actionSR={getSearchItemRequest}
+          actionCL={getEmployeesDataRequest}
         />
         <header>
           {
             column.map(
-              (item, i) => <div key={i} i={i} className='column'>{item}</div>
+              (item, i) => <div key={i} i={i} className={`column ${item}`}>{item}</div>
             )
           }
         </header>
-        <div className='rows-wrapper'>
-          {
-            combList.map(
-              (item, i) => (
-                <RowComponent
-                  i={i}
-                  key={i}
-                  edit={edit}
-                  item={item}
-                  modal={modal}
-                  column={column}
-                  setEdit={setEdit}
-                  setModal={setModal}
-                  options={departmentsOptions}
-                  deleteItemRequest={deleteItemRequest}
-                  updateItemRequest={updateItemRequest}
-                  getEditItemDataRequest={getEditItemDataRequest}
-                />
-              )
-            )
-          }
-        </div>
+          <div id='scrollableDiv' className='rows-wrapper'>
+            {/* <InfiniteScroll
+              dataLength={combList.length}
+              next={getMoreData()}
+              hasMore={true}
+              loader={<h4>Loading...</h4>}
+              height={500}
+              scrollableTarget="scrollableDiv"
+              endMessage={
+                <p style={{ textAlign: "center" }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }
+            > */}
+              {
+                combList.map(
+                  (item, i) => (
+                    <RowComponent
+                      i={i}
+                      key={i}
+                      edit={edit}
+                      item={item}
+                      modal={modal}
+                      column={column}
+                      setEdit={setEdit}
+                      setModal={setModal}
+                      options={departmentsOptions}
+                      deleteItemRequest={deleteItemRequest}
+                      updateItemRequest={updateItemRequest}
+                      getEditItemDataRequest={getEditItemDataRequest}
+                    />
+                  )
+                )
+              }
+            {/* </InfiniteScroll> */}
+          </div>
       </div>
       {
         modal &&
@@ -231,9 +221,9 @@ const mapStateToProps = (state) => (createStructuredSelector({
 export default connect(mapStateToProps, {
   createItemRequest,
   deleteItemRequest,
-  updateItemRequest,
   getSearchItemRequest,
   getEditItemDataRequest,
+  getEmployeesDataRequest,
   getEmployeesDataSuccess,
   getDepartmentsDataSuccess,
 })(ItemListComponent);

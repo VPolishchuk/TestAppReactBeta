@@ -7,12 +7,27 @@
 
     .rows-wrapper,header {
         & .column {
-            flex: 1;
+            // flex: 1;
             display: flex;
             padding: 0 15px;
             align-items: center;
-            justify-content: center;
-            border-right: 1.5px solid #948888;
+            justify-content: flex-start;
+            border-right: 1px solid #948888;
+            &.empActive {
+                width: 110px;
+            }
+            &.empID {
+                width: 260px;
+            }
+            &.empName {
+                width: 214px;
+            }
+            &.empDepartment {
+                width: 200px;
+            }
+            &.actions {
+                width: 115px;
+            }
         }
     }
 
@@ -20,73 +35,50 @@
         width: 100%;
         height: 50px;
         display: flex;
-        box-shadow: -1px 0px 8px 0px #948888;
+        border: 1px solid #948888;
     }
 
     .rows-wrapper {
         width: 100%;
-        max-height: 60vh;
-        margin-top: 20px;
+        max-height: 50vh;
         overflow-y: scroll;
         height: max-content;
-
-        .row-wrap {
+        border: 1px solid #948888;
+        
+        .row {
             width: 100%;
-            position: relative;
+            height: 50px;
+            display: flex;
+            border-top: 1px solid #948888;
+            border-bottom: 1px solid #948888;
             
-            .row {
-                display: flex;
-                width: 100%;
-                height: 40px;
-                margin: 5px 0;
-                box-shadow: -1px 0px 8px 0px #948888;
-    
-                .column.actions > img {
-                    cursor: pointer;
-                    margin: 0 4px;
-                }
-            }
 
-            form.active {
-                width: 100%;
-                display: flex;
-                margin: 10px 0;
-                height: 40px;
-
-                & label {
-                    flex: 1;
-                    display: flex;
-                    align-items: center;
+            .column {
+                &.empActive {
                     justify-content: center;
-
-                    input {
-                        width : 90%;
-                        height: 40px;
-                        border: 0;
-                        cursor: text;
-                        padding: 0 15px 0;
-                        border-bottom: 1px solid #948888; 
-                    }
                 }
 
-                button {
-                    flex: 1;
-                    border: 0;
-                    width: 100px;
-                    height: 40px;
-                    color: #fff;
-                    font-size: 18px;
-                    cursor: pointer;
-                    background: #333;
-                    border-radius: 5px;
-            
-                    &:hover {
-                        border-radius: 5px;
-                        font-weight: bold;
-                    }
-                }   
-            }
+                &.actions {
+                    justify-content: flex-end;
 
+                        & > img {
+                        cursor: pointer;
+                        margin: 0 4px;
+                        &.view {
+                            height: 30px;
+                            width: 25px;
+                        }
+
+                        &.edit {
+                            width: 23px;
+                        }
+
+                        &.delete {
+                            width: 23px;
+                        }
+                    }
+                }
+            }
         }
 
     }
@@ -104,4 +96,37 @@
     align-items: center;
     justify-content: center;
     background-color: rgba(0,0,0,0.3);
+}
+
+
+.search-wrap {
+    width: 400px;
+    height: 40px;
+    display: flex;
+    margin: 10px 0;
+    position: relative;
+    align-items: center;
+    img {
+        top: 9px;
+        left: 10px;    
+        width: 33px;
+        height: 25px;
+        position: absolute;
+        border-right: 2px solid #948888;
+    }
+
+    input[type='search'] {
+        width : 100%;
+        height: 40px;
+        margin: 10px 0;
+        border: 0;
+        cursor: text;
+        border-radius: 5px;
+        padding-left: 50px;
+        padding-right: 10px;
+        box-shadow: -1px 0px 8px 0px #948888;
+
+
+        
+    }
 }

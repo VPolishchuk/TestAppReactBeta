@@ -7,6 +7,8 @@ export const getEmployeesDataRequest = createAction('getEmployeesDataRequest');
 
 export const getDepartmentsDataSuccess = createAction('getDepartmentsDataSuccess');
 
+export const getDepartmentsDataRequest = createAction('getDepartmentsDataRequest');
+
 export const createItemRequest = createAction('createItemRequest');
 
 export const deleteItemRequest = createAction('deleteItemRequest');

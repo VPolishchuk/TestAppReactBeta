@@ -9,7 +9,7 @@ import './style.scss';
 import { connect } from 'react-redux';
 import { makeSelectItem } from '../selectors';
 import { clearEditItemRequest, updateItemRequest } from '../actions';
-import { createStructuredSelector } from 'reselect';
+import {  createStructuredSelector } from 'reselect';
 /////////////////////////////////////////////////////////////////////////
 
 const fieldSetting = [
@@ -21,7 +21,7 @@ const fieldSetting = [
     {
         type: 'checkbox',
         name: 'empActive',
-        label: 'Active',
+        label: 'empActive',
     },
     {
         type: 'select',
@@ -32,12 +32,12 @@ const fieldSetting = [
 ];
 
 const FormComponent = (props) => {
-  // const [checked, setChecked] = useState(false);
+  const handleChangeR = (name, data) => {
+    props.setValues(R.assoc(name, data, props.values))
+  }
   useEffect(() => {
     props.setValues(props.initValues)
   }, [props.initValues])
-  // console.log('values', props.values)
-  // console.log('checked', checked)
   return (
     <form id ='create-item-form' onSubmit={props.handleSubmit}>
       <p>{props.edit ? 'Edit Item' : 'Add Item'}</p>
@@ -49,8 +49,8 @@ const FormComponent = (props) => {
                   <SelectInput
                     {...field}
                     {...props}
-                    // initValue={props.values && R.path([field.name], props.values)}
-                    defOption={props.edit ? props.values && R.path([field.name], props.values) : {}}
+                    handelChangeR={handleChangeR}
+                    selectedOption={props.values && props.values[field.name]}
                   />
                 )
               }
@@ -60,9 +60,8 @@ const FormComponent = (props) => {
                   <Checkbox
                     {...field}
                     {...props}
-                    // setChecked={setChecked}
-                    // checked={props.values && R.path([field.name], props.values)}
-                    // checked={props.edit ? props.values && R.path([field.name], props.values) : checked}
+                    handelChangeR={handleChangeR}
+                    checked={props.values && props.values[field.name]}
                   />
                 )
               }
@@ -72,7 +71,7 @@ const FormComponent = (props) => {
                 <input
                     {...field}
                     onBlur={props.handleBlur}
-                    onChange={props.handleChange}
+                    onChange={(e) => handleChangeR(field.name, e.target.value)}
                     value={props.values && props.values[field.name]}
                   />
               </div>
@@ -89,15 +88,13 @@ const FormComponent = (props) => {
 }
 
 export const CreateEmpFormComponent = (props) => {
-  const { setModal, setEdit, options, item, edit, clearEditItemRequest } = props;
-  const [initialValues, setInitialValues] = useState(null);
+  const { setModal, setEdit, options, initialValues, edit, clearEditItemRequest, updateItemRequest } = props;
   const dafauldFields = {
     empID: '',
     empName: '',
-    empActive: '',
+    empActive: false,
     empDepartment: ''
   }
-
   const closeModal = () => {
     if (edit) {
       setEdit(!edit)
@@ -105,9 +102,6 @@ export const CreateEmpFormComponent = (props) => {
     }
     setModal(false)
   }
-  useEffect(() => {
-    setInitialValues(item)
-  }, [item])
   return (
       <div className='item-form-wrap'>
           <Formik
@@ -119,7 +113,10 @@ export const CreateEmpFormComponent = (props) => {
                   R.path(['value'], empDpID),
                   R.omit(['empDepartment'], values)
                 );
-                formValue = R.assoc('empID', '', formValue);
+                if (!edit) {
+                  formValue = R.assoc('empID', '', formValue);
+                }
+
                 const createItem  = async () => {
                   try {
                     await app
@@ -128,6 +125,21 @@ export const CreateEmpFormComponent = (props) => {
                       ...formValue
                     })
                       
+                  } catch(err) {
+                      console.error(err)
+                  }
+                }
+
+                const updateItem  = async () => {
+                  try {
+                    await app
+                    .firestore()
+                    .collection("employees").
+                    doc(formValue.empID)
+                    .set({
+                      ...formValue
+                    })
+                    updateItemRequest({id: formValue.empID, values: formValue })
                   } catch(err) {
                       console.error(err)
                   }
@@ -148,8 +160,8 @@ export const CreateEmpFormComponent = (props) => {
             //             console.error("Error removing document: ", error);
             //         });
             // }}
-                // edit ?
-                // updateItem() : 
+                edit ?
+                updateItem() : 
                 createItem()
                 setModal(false);
               }}
@@ -172,9 +184,10 @@ export const CreateEmpFormComponent = (props) => {
 
 
 const mapStateToProps = (state) => (createStructuredSelector({
-  item: makeSelectItem(state),
+  initialValues: makeSelectItem(state),
 }));
 
 export default connect(mapStateToProps, {
+  updateItemRequest,
   clearEditItemRequest,
 })(CreateEmpFormComponent);
