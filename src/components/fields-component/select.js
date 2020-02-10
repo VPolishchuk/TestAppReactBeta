@@ -10,7 +10,7 @@ const SelectInputComponent = ({
     options,
     labelDisplay,
     selectedOption,
-    handelChangeR
+    handelCastomChange
   }) => (
     <>
     {
@@ -20,7 +20,7 @@ const SelectInputComponent = ({
     <Select
         options={options}
         value={selectedOption}
-        onChange={(newOpt) => handelChangeR(name, newOpt)}
+        onChange={(newOpt) => handelCastomChange(name, newOpt)}
     />
     </ >
 )

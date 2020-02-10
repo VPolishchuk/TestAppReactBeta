@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import * as R from 'ramda';
+import {  createStructuredSelector } from 'reselect';
+import { connect } from 'react-redux';
 import { Formik } from 'formik';
 import app from "../../../firebase-config";
 import Checkbox from '../../../components/fields-component/checkbox';
 import SelectInput from '../../../components/fields-component/select';
 import './style.scss';
-
-import { connect } from 'react-redux';
 import { makeSelectItem } from '../selectors';
 import { clearEditItemRequest, updateItemRequest } from '../actions';
-import {  createStructuredSelector } from 'reselect';
 /////////////////////////////////////////////////////////////////////////
 
 const fieldSetting = [
@@ -21,7 +20,7 @@ const fieldSetting = [
     {
         type: 'checkbox',
         name: 'empActive',
-        label: 'empActive',
+        label: 'Emp Active',
     },
     {
         type: 'select',
@@ -49,7 +48,7 @@ const FormComponent = (props) => {
                   <SelectInput
                     {...field}
                     {...props}
-                    handelChangeR={handleChangeR}
+                    handelCastomChange={handleChangeR}
                     selectedOption={props.values && props.values[field.name]}
                   />
                 )
@@ -60,7 +59,7 @@ const FormComponent = (props) => {
                   <Checkbox
                     {...field}
                     {...props}
-                    handelChangeR={handleChangeR}
+                    handelCastomChange={handleChangeR}
                     checked={props.values && props.values[field.name]}
                   />
                 )
@@ -80,8 +79,8 @@ const FormComponent = (props) => {
         )
       }         
       <div className='action-wrap'>
-        <button type='submit'>Save</button>
-        <button type='button' onClick={() => props.closeModal()}>Cancel</button>
+        <button type='submit' className='add-emp'>Save</button>
+        <button type='button' className='cancel' onClick={() => props.closeModal()}>Cancel</button>
       </div>
     </form>
   )
@@ -144,22 +143,6 @@ export const CreateEmpFormComponent = (props) => {
                       console.error(err)
                   }
                 }
-
-
-            //     const empDpID = R.path(['empDepartment', 'value'], values);
-            //     // const newValue = R.assoc('emp_dpID', empDpID, R.omit(['empDepartment'], values))
-            //     const db = app.firestore()
-             
-                
-            //     db.collection('employees').doc(item.empID).set({...R.omit(['empDepartment'], values)})
-            //         .then(function(data) {
-            //             console.log("Document successfully deleted!", data);
-            //             // debugger;
-            //             updateItemRequest({id: item.empID, values: values })
-            //         }).catch(function(error) {
-            //             console.error("Error removing document: ", error);
-            //         });
-            // }}
                 edit ?
                 updateItem() : 
                 createItem()

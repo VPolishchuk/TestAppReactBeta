@@ -5,7 +5,6 @@ div.layout {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: wheat;
     
     form {
         width: 500px;
@@ -35,23 +34,10 @@ div.layout {
                 border-radius: 5px;
             }
 
-
         }
     
         button {
-            border: 0;
             width: 100%;
-            height: 45px;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            background: #333;
-            border-radius: 5px;
-    
-            &:hover {
-                border-radius: 5px;
-                font-weight: bold;
-            }
         }
     }
 }

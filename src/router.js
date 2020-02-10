@@ -12,6 +12,8 @@ import {
 import PrivateRoute from './features/home';
 import SingInForm from './features/auth/index';
 import ProtectedPage from './features/item-list/index';
+import DetailPageComponent from './features/item-list/component/detail-page';
+import NoMatch from './features/error-page';
 // root
 import mainSaga from './saga';
 import createStore from './store';
@@ -26,25 +28,26 @@ const store = createStore(
   routerMiddleware(history)
 );
 
+export const RouteWithSubRoutes = (route) => (
+  <Route
+    path={route.path}
+    render={(props) => (
+      <route.component {...props} routes={route.routes} />
+    )}
+  />
+);
+
 const RootContainer = withRouter((props) => (
   <Switch>
-    {/* {
-      props.routes.map(
-        (route, i) => (
-          <Route key={i} {...route} />
-        )
-      )
-    } */}
-      <Route exact path="/sing-in" >
-        <SingInForm {...props} />
-      </Route>
-      <PrivateRoute exact path="/">
-        <ProtectedPage {...props} />
-      </PrivateRoute>
+    {props.routes.map((route, i) => (
+      <RouteWithSubRoutes key={i} {...route} />
+    ))}
+    <Route path="*">
+      <NoMatch />
+    </Route>
   </Switch>
 ));
 
-//TODO: after add here redux-store and create auth-component  structure in this file will be changed
 class AppRouter extends Component {
   render() {
     return (

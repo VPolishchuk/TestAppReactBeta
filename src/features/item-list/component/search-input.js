@@ -5,13 +5,14 @@ import './style.scss';
 ///////////////////////////////////////////////////////
 const SearchComponent = (props) => {
     const [value, setValue] = useState(null);
-    const [searchField, setSearchfield] = useState(null);
     const handelClean = () => {
-        setValue(null);
+        props.setHasMore(true)
+        setValue('');
         props.actionCL();
     }
 
     const handelSearch = () => {
+        props.setHasMore(false)
         const db = app.firestore();
         const docRef = db.collection("employees").where("empName", "==", value)
             .get()
@@ -35,13 +36,24 @@ const SearchComponent = (props) => {
         <div className='search-wrap'>
             <img src="https://img.icons8.com/material-rounded/24/000000/search.png"></img>
             <input
-                type='search'
+                type='text'
                 value={value}
                 placeholder={`Search by empName`}
                 onChange={(e) => setValue(e.target.value)}
             />
-            <button onClick={() => handelSearch()} >search</button>
-            <button onClick={() => handelClean()} >Clear Filter</button>
+            <button
+                disabled={R.or(R.isNil(value), R.isEmpty(value) ? true : false)}
+                onClick={() => handelSearch()}
+            >
+                Search
+            </button>
+            <button
+                disabled={R.or(R.isNil(value), R.isEmpty(value) ? true : false)}
+                onClick={() => handelClean()}
+                className='cancel'
+            >
+                Clear Filter
+            </button>
         </div>
     );
 }

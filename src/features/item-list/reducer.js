@@ -18,10 +18,13 @@ const getEditItemDataRequest = (state, data) => (
 );
 
 const getEmployeesListData = (state, data) => {
-  const indexObj =  R.indexBy(R.prop('empID'), data);
+  const indexObj =  R.indexBy(R.prop('empID'), data.employeesData);
   const newData = R.merge(R.path(['employeesList'], state), indexObj)
   return (
-  P.$set('employeesList', newData, state)
+  P.$all(
+    P.$set('employeesList', newData),
+    P.$set('lastVisible', data.lastVisible),
+    state)
 )};
 
 const getSearchItemRequest = (state, data) => {
@@ -36,6 +39,10 @@ const getDepartmentsListData = (state, data) => (
 
 const deleteEmployeerFromList = (state, data) => (
   P.$set('employeesList', R.omit([data], R.path(['employeesList'], state)), state)
+);
+
+const getDetailPageSuccess = (state, data) => (
+  P.$set('item', data, state)
 );
 
 const clearEditItemRequest = (state, data) => (
@@ -60,4 +67,5 @@ export default createReducer({
   [A.getEditItemDataRequest]: getEditItemDataRequest,
   [A.clearEditItemRequest]: clearEditItemRequest,
   [A.getSearchItemRequest]: getSearchItemRequest,
+  [A.getDetailPageSuccess]: getDetailPageSuccess,
 }, initialState);

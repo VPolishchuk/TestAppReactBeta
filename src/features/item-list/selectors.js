@@ -24,9 +24,15 @@ const makeSelectLimitList = () => createSelector(
   (list) => R.path(['limit'], list),
 );
 
+const makeSelectLastVisible = () => createSelector(
+  selectProfileStore,
+  (list) => R.path(['lastVisible'], list),
+);
+
 export {
   makeSelectItem,
   makeSelectLimitList,
+  makeSelectLastVisible,
   makeSelectEmployeesList,
   makeSelectDepartmentsList
 };

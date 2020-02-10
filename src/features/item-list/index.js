@@ -1,14 +1,14 @@
-// import * as R from 'ramda';
 import * as R from 'ramda';
 import { connect } from 'react-redux';
 import React, { useState, useEffect } from 'react';
 import { createStructuredSelector } from 'reselect';
 import InfiniteScroll from "react-infinite-scroll-component";
+import * as C from '../../global/constants';
+import { goToRoute } from '../../routes-saga';
 // features
 import app from "../../firebase-config";
 import SearchComponent from './component/search-input';
 import CreateEmpFormComponent from './component/item-form';
-// import CreateEmpFormComponent from './component/form';
 import {
   makeSelectEmployeesList,
   makeSelectDepartmentsList } from './selectors';
@@ -17,19 +17,24 @@ import {
   deleteItemRequest,
   getSearchItemRequest,
   getEditItemDataRequest,
-  getEmployeesDataSuccess,
   getEmployeesDataRequest,
-  getDepartmentsDataSuccess,
 } from './actions';
 // ui
 import './style.scss';
 // /////////////////////////////////////////////////////////////////
 
+export const replaceKeysToParams = (options, endpoint) => {
+  if (R.or(R.is(String, options), R.is(Number, options))) {
+    return R.replace(/:[^/]*/, options, endpoint);
+  } 
+  return endpoint;
+};
+
 const ActionComponent = (props) => {
-  const { handleEditEmp, handelDelete } = props;
+  const { handleEditEmp, handelDelete, handleGoToDetailPage } = props;
   return (
     <div className='column actions'>
-      <img className='view' src="https://img.icons8.com/ios/50/000000/invisible.png" />
+      <img className='view' onClick={() => handleGoToDetailPage()} src="https://img.icons8.com/ios/50/000000/invisible.png" />
       <img className='edit' onClick={() => handleEditEmp()} src="https://img.icons8.com/ios-glyphs/30/000000/edit.png"/>
       <img className='delete'  onClick={() => handelDelete()}  src="https://img.icons8.com/material-rounded/24/000000/delete.png"/>
     </div>
@@ -47,6 +52,11 @@ const RowComponent = (props) => {
     deleteItemRequest,
     getEditItemDataRequest,
    } = props;
+  
+  const handleGoToDetailPage = () => {
+    goToRoute(replaceKeysToParams(item.empID, C.ROUTE_PATH_DETAILS))
+  }
+
   const handleEditEmp = () => {
     getEditItemDataRequest(item);
     setEdit(!edit)
@@ -71,6 +81,7 @@ const RowComponent = (props) => {
           if(key === 'actions') {
             return (
               <ActionComponent
+                handleGoToDetailPage={handleGoToDetailPage}
                 handleEditEmp={handleEditEmp}
                 handelDelete={handelDelete}
               />
@@ -110,16 +121,13 @@ export const ItemListComponent = (props) => {
     deleteItemRequest,
     getSearchItemRequest,
     getEditItemDataRequest,
-    getEmployeesDataSuccess,
-    getEmployeesDataRequest,
-    getDepartmentsDataSuccess } = props;
+    getEmployeesDataRequest  } = props;
   const [modal, setModal] = useState(false);
   const [edit, setEdit] = useState(false)
-  const [hasMore, setHasMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
 
   const getMoreData = () => {
-    props.getEmployeesDataRequest();
-
+    props.getEmployeesDataRequest(true);
   }
 
   const departmentsOptions = departmentsList.map(
@@ -151,6 +159,7 @@ export const ItemListComponent = (props) => {
       </nav>
       <div className='tb-wrap'>
         <SearchComponent
+          setHasMore={setHasMore}
           actionSR={getSearchItemRequest}
           actionCL={getEmployeesDataRequest}
         />
@@ -162,19 +171,19 @@ export const ItemListComponent = (props) => {
           }
         </header>
           <div id='scrollableDiv' className='rows-wrapper'>
-            {/* <InfiniteScroll
+            <InfiniteScroll
               dataLength={combList.length}
-              next={getMoreData()}
-              hasMore={true}
+              next={getMoreData}
+              hasMore={hasMore}
               loader={<h4>Loading...</h4>}
-              height={500}
+              height={300}
               scrollableTarget="scrollableDiv"
               endMessage={
                 <p style={{ textAlign: "center" }}>
                   <b>Yay! You have seen it all</b>
                 </p>
               }
-            > */}
+            >
               {
                 combList.map(
                   (item, i) => (
@@ -195,7 +204,7 @@ export const ItemListComponent = (props) => {
                   )
                 )
               }
-            {/* </InfiniteScroll> */}
+            </InfiniteScroll>
           </div>
       </div>
       {
@@ -224,6 +233,4 @@ export default connect(mapStateToProps, {
   getSearchItemRequest,
   getEditItemDataRequest,
   getEmployeesDataRequest,
-  getEmployeesDataSuccess,
-  getDepartmentsDataSuccess,
 })(ItemListComponent);
