@@ -1,130 +1,236 @@
 import * as R from 'ramda';
 import { connect } from 'react-redux';
-import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { createStructuredSelector } from 'reselect';
-import  bgHome from '../../static/bgHome.jpg';
-// component
-import SingInForm from '../auth';
-// constants
-import * as GC from '../../global/constants';
-// icon
-import * as I from '../../icons';
-// helpers
-import * as G from '../../global/helpers';
-// ui
-import { FlexBox, pulse, PositionedFlex } from '../../ui';
+import InfiniteScroll from "react-infinite-scroll-component";
+import * as C from '../../global/constants';
+import { goToRoute } from '../../routes-saga';
 // features
-import { makeSelectItemList } from './selectors';
-import ItemCardBox from './components/item-card-box';
-import ItemFormComponent from './components/create-item-form';
-import { createItemRequest, deleteItemRequest } from './actions';
+import app from "../../firebase-config";
+import SearchComponent from './component/search-input';
+import CreateEmpFormComponent from './component/item-form';
+import {
+  makeSelectEmployeesList,
+  makeSelectDepartmentsList } from './selectors';
+import {
+  createItemRequest,
+  deleteItemRequest,
+  getSearchItemRequest,
+  getEditItemDataRequest,
+  getEmployeesDataRequest,
+} from './actions';
+// ui
+import './style.scss';
 // /////////////////////////////////////////////////////////////////
 
-
-export const ItemListComponent = (props) => {
-  const [viewForm, setViewForm] = useState(false);
-  const handlerOut = () => {
-    G.clearSessionStore();
-    G.goToRoute(GC.ROUTE_PATH_SING_IN)
-    return;
-  }
-  const localeStoreAuth = G.getSessionStorage('auth');
-  const auth = R.pathOr(false, ['loggedIn'], localeStoreAuth);
-  return (
-    auth ?
-    <FlexBox
-      width='100vw'
-      minHeight='100vh'
-      backgroundSize='auto'
-      background={`url(${bgHome}) no-repeat rgba(255, 255, 250, 0.3) center;`}    
-    >
-      <PositionedFlex
-        p='20px'
-        width='100vw'
-        minHeight='100vh'
-        position='relative'
-        height='max-content'
-        flexDirection='column'
-        alignItems='space-between'
-        justifyContent='flex-start'
-        bg='rgba(255, 255, 250, 0.3)'
-      >
-        <PositionedFlex
-          mr='20px'
-          top='30px'
-          bg='#E5E5E5'
-          right='70px'
-          width='60px'
-          height='60px'
-          cursor='pointer'
-          position='fixed'
-          alignItems='center'
-          borderRadius='30px'
-          justifyContent='center'
-          additionalStyles={pulse}
-          onClick={() => handlerOut()}
-          boxShadow='0px 10px 40px rgba(27, 0, 70, 0.15)'
-        >
-          {I.logOut()}
-        </PositionedFlex>
-        <FlexBox
-          width='50%'
-          flexWrap='wrap'
-          justifyContent='flex-start'
-        >
-          {
-            R.or(props.itemList, []).map(
-              (item, i) => (
-                <ItemCardBox
-                  i={i}
-                  key={i}
-                  item={item}
-                  deleteItemRequest={props.deleteItemRequest}
-                />
-              )
-            )
-          }
-        </FlexBox>
-        <ItemFormComponent
-          width='400px'
-          height='max-content'
-          viewForm={viewForm}
-          setViewForm={setViewForm}
-          createItemRequest={props.createItemRequest}
-        />
-        <PositionedFlex
-          bg='#E5E5E5'
-          right='70px'
-          width='60px'
-          height='60px'
-          bottom='30px'
-          fontSize='26px'
-          cursor='pointer'
-          position='fixed'
-          alignItems='center'
-          borderRadius='30px'
-          justifyContent='center'
-          additionalStyles={pulse}
-          onClick={() => setViewForm(!viewForm)}
-          boxShadow='0px 10px 40px rgba(27, 0, 70, 0.15)'
-        >
-          +
-        </PositionedFlex>
-      </PositionedFlex>
-    </FlexBox> :
-    <Redirect
-      component={SingInForm}
-      to={GC.ROUTE_PATH_SING_IN}
-    />
-  );
+export const replaceKeysToParams = (options, endpoint) => {
+  if (R.or(R.is(String, options), R.is(Number, options))) {
+    return R.replace(/:[^/]*/, options, endpoint);
+  } 
+  return endpoint;
 };
 
+const ActionComponent = (props) => {
+  const { handleEditEmp, handelDelete, handleGoToDetailPage } = props;
+  return (
+    <div className='column actions'>
+      <img className='view' onClick={() => handleGoToDetailPage()} src="https://img.icons8.com/ios/50/000000/invisible.png" />
+      <img className='edit' onClick={() => handleEditEmp()} src="https://img.icons8.com/ios-glyphs/30/000000/edit.png"/>
+      <img className='delete'  onClick={() => handelDelete()}  src="https://img.icons8.com/material-rounded/24/000000/delete.png"/>
+    </div>
+)};
+
+const RowComponent = (props) => {
+  const {
+    item,
+    edit,
+    modal,
+    column,
+    options,
+    setEdit,
+    setModal,
+    deleteItemRequest,
+    getEditItemDataRequest,
+   } = props;
+  
+  const handleGoToDetailPage = () => {
+    goToRoute(replaceKeysToParams(item.empID, C.ROUTE_PATH_DETAILS))
+  }
+
+  const handleEditEmp = () => {
+    getEditItemDataRequest(item);
+    setEdit(!edit)
+    setModal(!modal)
+  }
+  const handelDelete = () => {
+    const db = app.firestore()
+    db.collection('employees').doc(item.empID).delete()
+      .then(function() {
+        console.log("Document successfully deleted!");
+        deleteItemRequest(item.empID)
+      }).catch(function(error) {
+          console.error("Error removing document: ", error);
+      });
+  }
+
+  return (
+    <div key={props.i} className='row'>
+      {
+        column.map(
+          (key,i ) => {
+          if(key === 'actions') {
+            return (
+              <ActionComponent
+                handleGoToDetailPage={handleGoToDetailPage}
+                handleEditEmp={handleEditEmp}
+                handelDelete={handelDelete}
+              />
+            )
+          }
+          if(key === 'empActive') {
+            return (
+              <div key={i} className='column empActive'>
+              {
+                item[key] ? 
+                <img src="https://img.icons8.com/material-rounded/24/000000/checked.png"/> :
+                <img src="https://img.icons8.com/material-rounded/24/000000/cancel.png"/>
+              }
+            </div>
+              
+            )
+          }
+          return (
+            <div key={i} className={`column ${key}`}>
+              {
+                R.is(Object, item[key]) ? 
+                item[key].label :
+                item[key]
+              }
+            </div>
+          )
+        })
+      }
+    </div>
+)};
+
+export const ItemListComponent = (props) => {
+  const {
+    employeesList,
+    departmentsList,
+    updateItemRequest,
+    deleteItemRequest,
+    getSearchItemRequest,
+    getEditItemDataRequest,
+    getEmployeesDataRequest  } = props;
+  const [modal, setModal] = useState(false);
+  const [edit, setEdit] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+
+  const getMoreData = () => {
+    props.getEmployeesDataRequest(true);
+  }
+
+  const departmentsOptions = departmentsList.map(
+    (item) => ({
+      value: item.dpID,
+      label: item.dpName,
+    })
+  );
+  const combList = R.values(employeesList).map(
+    (item) => {
+      const empDepartment = R.find(R.propEq('value', item.emp_dpID))(departmentsOptions);
+      let newItem = R.assoc('empDepartment', empDepartment, item);
+      newItem = R.omit(['emp_dpID'], newItem);
+      return newItem;
+  })
+  let column = R.keys(R.omit(['emp_dpID'], R.head(R.values(employeesList))));
+  column.push('empDepartment', 'actions');
+
+  return (
+    <>
+      <nav>
+        {
+          !modal &&
+          <button className='add-emp' onClick={() => setModal(true)}>
+            Add Employees
+          </button>
+        }
+        <button onClick={() => app.auth().signOut()}>Sign out</button>
+      </nav>
+      <div className='tb-wrap'>
+        <SearchComponent
+          setHasMore={setHasMore}
+          actionSR={getSearchItemRequest}
+          actionCL={getEmployeesDataRequest}
+        />
+        <header>
+          {
+            column.map(
+              (item, i) => <div key={i} i={i} className={`column ${item}`}>{item}</div>
+            )
+          }
+        </header>
+          <div id='scrollableDiv' className='rows-wrapper'>
+            <InfiniteScroll
+              dataLength={combList.length}
+              next={getMoreData}
+              hasMore={hasMore}
+              loader={<h4>Loading...</h4>}
+              height={300}
+              scrollableTarget="scrollableDiv"
+              endMessage={
+                <p style={{ textAlign: "center" }}>
+                  <b>Yay! You have seen it all</b>
+                </p>
+              }
+            >
+              {
+                combList.map(
+                  (item, i) => (
+                    <RowComponent
+                      i={i}
+                      key={i}
+                      edit={edit}
+                      item={item}
+                      modal={modal}
+                      column={column}
+                      setEdit={setEdit}
+                      setModal={setModal}
+                      options={departmentsOptions}
+                      deleteItemRequest={deleteItemRequest}
+                      updateItemRequest={updateItemRequest}
+                      getEditItemDataRequest={getEditItemDataRequest}
+                    />
+                  )
+                )
+              }
+            </InfiniteScroll>
+          </div>
+      </div>
+      {
+        modal &&
+        <div className='modal-wrap'>
+          <CreateEmpFormComponent
+            edit={edit}
+            setEdit={setEdit}
+            setModal={setModal}
+            options={departmentsOptions}
+          />
+        </div>
+      }
+    </>
+)}
+
+
 const mapStateToProps = (state) => (createStructuredSelector({
-  itemList: makeSelectItemList(state),
+  employeesList: makeSelectEmployeesList(state),
+  departmentsList: makeSelectDepartmentsList(state)
 }));
 
 export default connect(mapStateToProps, {
   createItemRequest,
   deleteItemRequest,
+  getSearchItemRequest,
+  getEditItemDataRequest,
+  getEmployeesDataRequest,
 })(ItemListComponent);

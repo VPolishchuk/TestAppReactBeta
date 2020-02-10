@@ -18,6 +18,7 @@ export const createStore = (
   mainSaga,
   ...additionalMiddlewares) => {
   const sagaMiddleware = createSagaMiddleware();
+
   const middleWares = [
     logger,
     sagaMiddleware,
@@ -30,10 +31,12 @@ export const createStore = (
     initialState,
     compose(...composables)
   );
+
   const sagas = [
     mainSaga,
   ];
   sagas.forEach((saga) => sagaMiddleware.run(saga));
+  
   if (module.hot) {
     module.hot.accept('./reducers', () => {
       store.replaceReducer(rootReducer(store.injectedReducers));

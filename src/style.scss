@@ -1,0 +1,81 @@
+
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    align-items: center;
+    height: max-content;
+    flex-direction: column;
+    background-color: white;
+    justify-content: flex-start;
+
+    nav {
+        width: 100%;
+        height: 60px;
+        display: flex;
+        padding: 5px 20px;
+        align-items: center;
+        justify-content: flex-end;
+    }
+}
+
+// button
+button {
+    border: 0;
+    height: 40px;
+    color: #fff;
+    margin: 0 15px;
+    font-size: 18px;
+    cursor: pointer;
+    background: #1785f2;
+    padding: 10px 14px;
+    border-radius: 5px;
+    font-weight: bold;
+    &:active, 
+    &:focus,
+    &:hover {
+        box-shadow: -1px 0px 8px 0px #948888;
+    }
+    &.add-emp {
+        background: green;
+    }
+    &.cancel {
+        background: #434446;
+    }
+}
+
+// imputs
+.input-wrap {
+    display: flex;
+    margin: 10px 0;
+    position: relative;
+    align-items: center;
+    label span {
+        margin-right: 15px;
+    }
+    input {
+        border: 0;
+        width : 70%;
+        height: 40px;
+        cursor: text;
+        margin: 10px 0;
+        padding: 0 15px 0;
+        border-radius: 5px;
+        border: 1px solid #948888;
+        
+    }
+}
+
+.error-page {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    h2 {
+        color: red;
+        text-align: center;
+    }
+}

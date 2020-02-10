@@ -1,0 +1,46 @@
+@import '../../style.scss';
+///////////////////////////////
+
+.checkbox-container {
+    vertical-align: middle;
+    display: inline-flex;
+
+    input[type='checkbox'] {
+        border: 0;
+        padding: 0;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        position: absolute;
+        white-space: nowrap;
+    }
+
+    .styled-container {
+        width: 16px;
+        height: 16px;
+        background: salmon;
+        border-radius: 3px;
+        display: inline-block;
+        transition: all 150ms;
+
+        &.checked {
+            background: papayawhip;
+        }
+
+        &:focus + & {
+            box-shadow: 0 0 0 3px pink;
+        }
+
+        svg {
+            visibility: hidden;
+
+            &.checked {
+                visibility: visible;
+            }
+        }
+
+    }
+}

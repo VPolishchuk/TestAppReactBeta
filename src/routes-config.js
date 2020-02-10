@@ -1,21 +1,33 @@
+import * as C from './global/constants'
 // features
-import App from './components/App';
 import SingInForm from './features/auth';
-import ItemListComponent from './features/item-list'
-// global
-import * as GC from './global/constants';
+import HomeComponent from './features/home';
+import ListComponent from './features/item-list/index';
+import DetailPageComponent from './features/item-list/component/detail-page';
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 export default [
   {
+    exact: true,
     name: 'SingInForm',
     component: SingInForm,
-    path: GC.ROUTE_PATH_SING_IN,
+    path: C.ROUTE_PATH_SING_IN,
   },
   {
-    exact: true,
     name: 'app',
-    path: GC.ROUTE_PATH_HOME,
-    component: ItemListComponent,
+    path: '/',
+    component: HomeComponent,
+    routes: [
+      {
+        exact: true,
+        component: ListComponent,
+        path: C.ROUTE_PATH_LIST,
+      },
+      {
+        exact: true,
+        component: DetailPageComponent,
+        path: C.ROUTE_PATH_DETAILS,
+      },
+    ]
   },
 ];
