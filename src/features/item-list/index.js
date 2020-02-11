@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import { connect } from 'react-redux';
-import React, { useState, useEffect } from 'react';
+import React, { useState, } from 'react';
 import { createStructuredSelector } from 'reselect';
 import InfiniteScroll from "react-infinite-scroll-component";
 import * as C from '../../global/constants';

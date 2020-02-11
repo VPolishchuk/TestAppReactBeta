@@ -1,5 +1,6 @@
 import React, { useContext, } from 'react';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { Redirect } from "react-router";
 // features
 import app from "../../firebase-config";
@@ -17,6 +18,14 @@ const SingInForm = (props) => {
   return (
     <div className='layout'>
       <Formik
+        validationSchema={Yup.object({
+          email: Yup.string()
+            .email('must be email')
+            .required('Required'),
+          password: Yup.string()
+            .required('Required'),
+        })
+      }
         initialValues={{
           email: '',
           password: ''

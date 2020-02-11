@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import * as R from 'ramda';
+import * as Yup from 'yup';
 import {  createStructuredSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { Formik } from 'formik';
@@ -31,6 +32,7 @@ const fieldSetting = [
 ];
 
 const FormComponent = (props) => {
+  console.log('props', props)
   const handleChangeR = (name, data) => {
     props.setValues(R.assoc(name, data, props.values))
   }
@@ -45,23 +47,23 @@ const FormComponent = (props) => {
           (field, i) => {
               if (field.type === 'select') {
                 return (
-                  <SelectInput
-                    {...field}
-                    {...props}
-                    handelCastomChange={handleChangeR}
-                    selectedOption={props.values && props.values[field.name]}
-                  />
+                    <SelectInput
+                      {...field}
+                      {...props}
+                      handelCastomChange={handleChangeR}
+                      selectedOption={props.values && props.values[field.name]}
+                    />
                 )
               }
 
               if (field.type === 'checkbox') {
                 return (
-                  <Checkbox
-                    {...field}
-                    {...props}
-                    handelCastomChange={handleChangeR}
-                    checked={props.values && props.values[field.name]}
-                  />
+                    <Checkbox
+                      {...field}
+                      {...props}
+                      handelCastomChange={handleChangeR}
+                      checked={props.values && props.values[field.name]}
+                    />
                 )
               }
               return  (
@@ -73,6 +75,18 @@ const FormComponent = (props) => {
                     onChange={(e) => handleChangeR(field.name, e.target.value)}
                     value={props.values && props.values[field.name]}
                   />
+                {R.or(R.has(field.name, props.touched), R.has(field.name, props.errors)) ? (
+                  <div
+                    className="error"
+                    style={{
+                      color: 'red',
+                      fontSize: '12px',
+                      marginTop: '5px',
+                      textAlign: 'center',
+                    }}
+                  >
+                  {props.errors[field.name]}</div>
+                ) : null}
               </div>
             )
           }
@@ -148,6 +162,19 @@ export const CreateEmpFormComponent = (props) => {
                 createItem()
                 setModal(false);
               }}
+              validationSchema={Yup.object({
+                  empName: Yup.string()
+                    .required('Required'),
+                  empActive: Yup.boolean()
+                    .required('Required'),
+                  empDepartment: Yup.object({
+                    value: Yup.string()
+                    .required('Required'),
+                    label: Yup.string()
+                    .required('Required')
+                  })
+                })
+              }
           >
             {
               props => (
